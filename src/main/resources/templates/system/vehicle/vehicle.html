@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('车辆列表')"/>
+    <th:block th:include="include :: layout-latest-css"/>
+    <th:block th:include="include :: ztree-css"/>
+</head>
+<body class="gray-bg">
+<div class="ui-layout-center">
+    <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="receivable-form">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <div>
+                                    <div class="input-group" style="width: 300px">
+                                        <input type="hidden" class="form-control" id="carId" name="carId">
+                                    </div>
+                                    <div class="input-group" style="width: 300px">
+                                        车辆名称：<input type="text" name="carName"/>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                车辆状态： <select id="carStatus" name="carStatus"
+                                              th:with="type=${@dict.getType('sys_car_status')}">
+                                <option value=''>所有</option>
+                                ??????????????????????
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}">
+                                </option>
+                            </select>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="tableSearch()"><i
+                                        class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="formClean()"><i
+                                        class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add(1)" shiro:hasPermission="system:vehicle:add">
+                    <i class="fa fa-plus"></i> 新增
+                </a>
+                <a class="btn btn-primary" onclick="$.operate.edit()" shiro:hasPermission="system:vehicle:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-info" id="expandAllBtn">
+                    <i class="fa fa-exchange"></i> 展开/折叠
+                </a>
+            </div>
+
+            <div class="col-sm-12 table-striped select-table">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: layout-latest-js"/>
+<th:block th:include="include :: ztree-js"/>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('system:vehicle:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('system:vehicle:remove')}]];
+    var gradeData = [[${@dict.getType('sys_car_status')}]];
+    var prefix = ctx + "system/vehicle"
+
+    $(function () {
+        queryUserList();
+    });
+
+    function queryUserList() {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove/{id}",
+            showFooter: true,
+            sortName: "carId",
+            sortOrder: "desc",
+            modalName: "车辆列表",
+            columns: [{
+                checkbox: true
+            }, {
+                field: 'carId',
+                visible: false
+            }, {
+                field: 'carCode',
+                title: '车辆编号'
+            }, {
+                field: 'carName',
+                title: '车辆名称'
+            }, {
+                field: 'carStatus',
+                title: '车辆状态',
+                formatter: function (value, row, index) {
+                    return $.table.selectDictLabel(gradeData, row.carStatus);
+                }
+            }, {
+                field: 'remark',
+                title: '备注'
+            }, {
+                field: 'createTime',
+                title: '创建日期'
+            }, {
+                field: 'updateTime',
+                title: '修改日期',
+            }, {
+                title: '操作',
+                align: 'center',
+                formatter: function (value, row, index) {
+                    var actions = [];
+                    actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.carId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                    actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.carId + '\')"><i class="fa fa-trash"></i>删除</a>');
+                    return actions.join('');
+                }
+            }]
+        };
+        $.table.init(options);
+    }
+
+    function tableSearch() {
+        $.table.search();
+    }
+
+    function formClean() {
+        $('#carId').val('');
+        $.form.reset();
+    }
+</script>
+</body>
+</html>

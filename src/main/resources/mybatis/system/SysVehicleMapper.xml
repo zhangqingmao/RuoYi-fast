@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.system.vehicle.mapper.SysVehicleMapper">
+
+    <resultMap type="SysVehicle" id="SysVehicleResult">
+        <id     property="carId"     column="car_id"     />
+        <result property="carCode"   column="car_code"   />
+        <result property="carStatus"  column="car_status"   />
+        <result property="carName"   column="car_name"   />
+        <result property="delFlag"   column="del_flag"   />
+        <result property="createBy"   column="create_by"   />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy"   column="update_by"   />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="selectVehicleVo">
+        select v.car_id, v.car_code, v.car_status, v.car_name, v.del_flag, v.create_by, v.create_time, v.update_by, v.update_time, v.remark from sys_vehicle v
+    </sql>
+
+    <select id="selectVehicleList" parameterType="SysVehicle" resultMap="SysVehicleResult">
+        <include refid="selectVehicleVo"/>
+        where v.del_flag = '0'
+        <if test="carCode != null and carCode != 0">
+            AND v.car_code = #{carCode}
+        </if>
+        <if test="carName != null and carName != ''">
+            AND v.car_name like concat('%', #{carName}, '%')
+        </if>
+        <if test="carStatus != null">
+            AND v.car_status = #{carStatus}
+        </if>
+    </select>
+
+    <select id="checkClientTypeNameUnique" resultMap="SysVehicleResult">
+        <include refid="selectVehicleVo"/>
+        where car_id=#{carId} and car_code = #{carCode}
+    </select>
+
+    <insert id="insertVehicle" parameterType="SysVehicle">
+        insert into sys_vehicle(
+        <if test="carCode != null and carCode != ''">car_code,</if>
+        <if test="carName != null and carName != ''">car_name,</if>
+        <if test="carStatus != null">car_status,</if>
+        <if test="delFlag != null">del_flag,</if>
+        <if test="remark != null and remark != ''">remark,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        )values(
+        <if test="carCode != null and carCode != ''">#{carCode},</if>
+        <if test="carName != null and carName != ''">#{carName},</if>
+        <if test="carStatus != null">#{carStatus},</if>
+        <if test="delFlag != null">#{delFlag},</if>
+        <if test="remark != null and remark != ''">#{remark},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        sysdate()
+        )
+    </insert>
+
+    <delete id="deleteById" parameterType="String">
+        update sys_vehicle set del_flag = 1 where car_id in(#{carId})
+    </delete>
+
+    <select id="selectVehicleById" parameterType="SysVehicle" resultMap="SysVehicleResult">
+        <include refid="selectVehicleVo"/>
+        where v.del_flag = '0' and v.car_id = #{carId}
+    </select>
+
+    <select id="checkUniqueName" parameterType="String" resultMap="SysVehicleResult">
+        <include refid="selectVehicleVo"/>
+        where v.del_flag = '0' and v.car_name = #{carName}
+    </select>
+
+    <select id="checkUniqueCode" parameterType="String" resultMap="SysVehicleResult">
+        <include refid="selectVehicleVo"/>
+        where v.del_flag = '0' and v.car_code = #{carCode}
+    </select>
+    
+    <update id="updateVehicle" parameterType="SysVehicle">
+        update sys_vehicle
+        <set>
+            <if test="carStatus != null">car_status = #{carStatus},</if>
+            <if test="carName != null and carName != ''">car_name = #{carName},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where car_id = #{carId}
+    </update>
+
+</mapper> 
