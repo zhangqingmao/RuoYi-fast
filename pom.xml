@@ -6,7 +6,7 @@
     <groupId>com.ruoyi</groupId>
     <artifactId>RuoYi</artifactId>
     <version>4.0.0</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <name>RuoYi</name>
     <url>http://www.ruoyi.vip</url>
@@ -39,6 +39,7 @@
         <jsoup.version>1.11.3</jsoup.version>
         <poi.version>3.17</poi.version>
         <oshi.version>3.9.1</oshi.version>
+        <docker.image.prefix>springboot</docker.image.prefix>
     </properties>
 
     <dependencies>
@@ -285,15 +286,29 @@
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <!-- Docker maven plugin -->
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.0.0</version>
                 <configuration>
-                    <fork>true</fork>
+                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                    <dockerDirectory>src/main/docker</dockerDirectory>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
                 </configuration>
             </plugin>
+            <!-- Docker maven plugin -->
         </plugins>
     </build>
 
