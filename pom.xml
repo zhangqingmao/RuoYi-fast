@@ -6,7 +6,7 @@
     <groupId>com.ruoyi</groupId>
     <artifactId>RuoYi</artifactId>
     <version>4.0.0</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <name>RuoYi</name>
     <url>http://www.ruoyi.vip</url>
@@ -55,6 +55,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <!-- redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
         <!-- SpringBoot 拦截器 -->
@@ -114,6 +120,12 @@
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
             <version>${druid.version}</version>
+        </dependency>
+
+        <!--RabbitMQ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
         <!--常用工具类 -->
